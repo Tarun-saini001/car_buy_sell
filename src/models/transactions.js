@@ -11,6 +11,8 @@ const transactions = mongoose.Schema({
     paymentId: { type: String },//stripe payment id
     subscriptionId :{type:String},
 },
+
+
     { timestamps: true }
 );
 
