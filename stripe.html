@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Stripe Payment Confirmation</title>
+    <script src="https://js.stripe.com/v3/"></script>
+  </head>
+  <body>
+    <h2>:credit_card: Complete Payment</h2>
+    <!-- Input your PaymentIntent client_secret -->
+    <input
+      type="text"
+      id="clientSecret"
+      placeholder="Enter client_secret from backend"
+      style="width: 400px;"
+    />
+    <br /><br />
+    <!-- Card input field -->
+    <div id="card-element" style="width: 400px; border: 1px solid #ccc; padding: 10px;"></div>
+    <br />
+    <button id="payBtn">Confirm Payment</button>
+    <p id="status"></p>
+    <script>
+      // :white_tick: Initialize Stripe with your publishable key
+      const stripe = Stripe("pk_test_51SNRS5FpEnqibSy6GOvknJ7cmWMeKUdmfhM49ql0XjYWjYYWtfYYkfTDnltSNhVdANcuUH3r5TRk8EANACprL5Ah00XZxPeOR4"); // replace with your actual publishable key
+      // :white_tick: Mount the card input field
+      const elements = stripe.elements();
+      const cardElement = elements.create("card");
+      cardElement.mount("#card-element");
+      // :white_tick: Confirm existing PaymentIntent
+      document.getElementById("payBtn").addEventListener("click", async () => {
+        const clientSecret = document.getElementById("clientSecret").value.trim();
+        if (!clientSecret) {
+          document.getElementById("status").innerText = ":x: Please enter a client_secret.";
+          return;
+        }
+        document.getElementById("status").innerText = ":hourglass_flowing_sand: Processing payment...";
+        // Confirm payment using the provided client_secret
+        const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: cardElement,
+            billing_details: { name: "Test User" }, // optional
+          },
+        });
+        if (error) {
+          document.getElementById("status").innerText = `:x: Payment Failed: ${error.message}`;
+        } else if (paymentIntent && paymentIntent.status === "succeeded") {
+          document.getElementById("status").innerText = ":white_tick: Payment Successful!";
+        } else {
+          document.getElementById("status").innerText = `:information_source: Payment status: ${paymentIntent?.status}`;
+        }
+      });
+    </script>
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
